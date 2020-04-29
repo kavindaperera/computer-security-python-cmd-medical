@@ -3,12 +3,9 @@ import time
 import configparser
 import getpass
 import hashlib
-
 # ====================================================
-
 config_file = 'config.ini'
 data_file = 'data.ini'
-
 
 # check username availability
 def checkAvailability(username):
@@ -23,7 +20,7 @@ def checkAvailability(username):
             available = False
     return available
 
-
+# verify username at login
 def verifyUsername(username):
     config = configparser.ConfigParser()
     config.read(config_file)
@@ -35,7 +32,7 @@ def verifyUsername(username):
             available = True
     return available
 
-
+# check patient detail availability
 def verifyPatient(patient_name):
     config = configparser.ConfigParser()
     config.read(data_file)
@@ -47,7 +44,7 @@ def verifyPatient(patient_name):
             available = True
     return available
 
-
+# verfity password at login
 def verifyPassword(username, password):
     config = configparser.ConfigParser()
     config.read(config_file)
@@ -59,7 +56,7 @@ def verifyPassword(username, password):
         print("***incorrect password***")
         return False
 
-
+# md5 encryption for passwords
 def encrypt(password):
     algorithm = hashlib.md5()
     algorithm.update(password.encode())
@@ -104,7 +101,7 @@ def staffSession(privilege_level):
             print("Not an option!")
             continue
 
-# viewonly session
+# view only session
 def viewSession(patient_name, pl):
     config = configparser.ConfigParser()
     config.read(data_file)
@@ -112,31 +109,31 @@ def viewSession(patient_name, pl):
         print("View Options: \n 1.personal details \n 2.sickness details \n 3.drug prescriptions \n 4.lab test prespriptions \n 5.back")
         option = input('> ')
         if option == '1':
-            print("\n ===================== \n")
+            print("\n=====================")
             print(config.get(patient_name, "personal_details"))
-            print("\n ===================== \n")
+            print("===================== \n")
             continue
         elif option == '2':
             if (pl=='admin_0' or pl=='admin_1' or pl=='admin_2' or pl=='admin_5'):
-                print("\n ===================== \n")
+                print("\n=====================")
                 print(config.get(patient_name, "sickness_details"))
-                print("\n ===================== \n")
+                print("===================== \n")
             else:
                 print('You do not have permission to view this section')
             continue
         elif option == '3':
             if (pl=='admin_0' or pl=='admin_1' or pl=='admin_2' or pl=='admin_5'):
-                print("\n ===================== \n")
+                print("\n=====================")
                 print(config.get(patient_name, "drug_prescription"))
-                print("\n ===================== \n")
+                print("===================== \n")
             else:
                 print('You do not have permission to view this section')
             continue
         elif option == '4':
             if (pl=='admin_0' or pl=='admin_1' or pl=='admin_2' or pl=='admin_3'):
-                print("\n ===================== \n")
+                print("\n=====================")
                 print(config.get(patient_name, "lab_test_prescription"))
-                print("\n ===================== \n")
+                print("===================== \n")
             else:
                 print('You do not have permission to view this section')
             continue
