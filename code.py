@@ -1,40 +1,38 @@
-#module imports
+# module imports
 import time
 import configparser
 import getpass
 import hashlib
 
-
-##====================================================
-
+# ====================================================
 
 config_file = 'config.ini'
 data_file = 'data.ini'
 
-#check username availability
+
+# check username availability
 def checkAvailability(username):
     config = configparser.ConfigParser()
     config.read(config_file)
     sections = config.sections()
     check_section = username
     available = True
-        
-    for s in sections:  
+    for s in sections:
         if s == check_section:
             print("Username Already Taken")
             available = False
-            
-    return available        
-    
+    return available
+
+
 def verifyUsername(username):
     config = configparser.ConfigParser()
     config.read(config_file)
     sections = config.sections()
     check_section = username
     available = False
-    for s in sections:  
-        if s == check_section:        
-            available = True           
+    for s in sections:
+        if s == check_section:
+            available = True
     return available
 
 
@@ -42,16 +40,15 @@ def verifyPatient(patient_name):
     config = configparser.ConfigParser()
     config.read(data_file)
     sections = config.sections()
-    check_section = patient_name 
+    check_section = patient_name
     available = False
-    for s in sections:  
-        if s == check_section:        
-            available = True           
+    for s in sections:
+        if s == check_section:
+            available = True
     return available
 
 
-
-def verifyPassword(username,password):
+def verifyPassword(username, password):
     config = configparser.ConfigParser()
     config.read(config_file)
     en_password = config.get(username, "password")
@@ -61,7 +58,6 @@ def verifyPassword(username,password):
     else:
         print("***incorrect password***")
         return False
-    
 
 
 def encrypt(password):
@@ -70,23 +66,18 @@ def encrypt(password):
     encrypted = algorithm.hexdigest()
     return encrypted
 
-#session
-
+# session
 def session(username):
     print("Welcome to your account ")
     config = configparser.ConfigParser()
     config.read(config_file)
     privilege_level = config.get(username, "privilege_level")
-    
-    if privilege_level=='admin_0':
+    if privilege_level == 'admin_0':
         patientSession(username)
-          
     else:
-        staffSession(privilege_level)  
-          
-        
+        staffSession(privilege_level)
 
-#staff session
+# staff session
 def staffSession(privilege_level):
     while True:
         print("Options: \n 1.view or edit patient details \n 2.logout")
@@ -102,155 +93,156 @@ def staffSession(privilege_level):
             patient_name = patient_name + " " + "patient"
             if(verifyPatient(patient_name)):
                 print("options: \n 1.view details \n 2.edit details")
-                option=input('> ')
-                if option=='1':
-                    viewSession(patient_name)
-                elif option=='2':
-                    editSession(patient_name,privilege_level)
+                option = input('> ')
+                if option == '1':
+                    viewSession(patient_name, privilege_level)
+                elif option == '2':
+                    editSession(patient_name, privilege_level)
             else:
                 print("No Records")
         else:
-            print ("Not an option!")
+            print("Not an option!")
             continue
-                    
-                    
-                    
-##viewonly session
 
-def viewSession(patient_name):
+# viewonly session
+def viewSession(patient_name, pl):
     config = configparser.ConfigParser()
     config.read(data_file)
     while True:
         print("View Options: \n 1.personal details \n 2.sickness details \n 3.drug prescriptions \n 4.lab test prespriptions \n 5.back")
         option = input('> ')
-        if option=='1':
+        if option == '1':
             print("\n ===================== \n")
             print(config.get(patient_name, "personal_details"))
             print("\n ===================== \n")
             continue
-        elif option=='2':
-            print("\n ===================== \n")
-            print(config.get(patient_name, "sickness_details"))
-            print("\n ===================== \n")
+        elif option == '2':
+            if (pl=='admin_0' or pl=='admin_1' or pl=='admin_2' or pl=='admin_5'):
+                print("\n ===================== \n")
+                print(config.get(patient_name, "sickness_details"))
+                print("\n ===================== \n")
+            else:
+                print('You do not have permission to view this section')
             continue
-        elif option=='3':
-            print("\n ===================== \n")
-            print(config.get(patient_name, "drug_prescription"))
-            print("\n ===================== \n")
+        elif option == '3':
+            if (pl=='admin_0' or pl=='admin_1' or pl=='admin_2' or pl=='admin_5'):
+                print("\n ===================== \n")
+                print(config.get(patient_name, "drug_prescription"))
+                print("\n ===================== \n")
+            else:
+                print('You do not have permission to view this section')
             continue
-        elif option=='4':
-            print("\n ===================== \n")
-            print(config.get(patient_name, "lab_test_prescription"))
-            print("\n ===================== \n")
+        elif option == '4':
+            if (pl=='admin_0' or pl=='admin_1' or pl=='admin_2' or pl=='admin_3'):
+                print("\n ===================== \n")
+                print(config.get(patient_name, "lab_test_prescription"))
+                print("\n ===================== \n")
+            else:
+                print('You do not have permission to view this section')
             continue
-        elif option=='5':
+        elif option == '5':
             break
 
-##edit file session
-
-def editSession(patient_name,pl):
+# edit file session
+def editSession(patient_name, pl):
     config = configparser.ConfigParser()
     config.read(data_file)
     while True:
-        print("Select a section to Edit: \n 1.personal details \n 2.sickness details \n 3.drug prescriptions \n 4.lab test prespriptions \n 5.back")
+        print("Select a section to Edit: \n 1.personal details \n 2.sickness details \n 3.drug prescriptions \n 4.lab test prespriptions \n 5.back/done")
         option = input('> ')
-        if option=='2':
-            if (pl=="admin_1" or pl=="admin_2" ):
+        if option == '2':
+            if (pl == "admin_1" or pl == "admin_2"):
                 details_old = config.get(patient_name, 'sickness_details')
-                print ('Old Record: ', details_old)
+                print('Old Record: ', details_old)
                 print("Enter New Details:")
                 details_new = input('> ').strip()
                 mode = input("Do you want to keep old records (Y/N): ")
                 while True:
-                    if (mode == 'y' or mode=='Y'):
+                    if (mode == 'y' or mode == 'Y'):
                         details = details_old + ', ' + details_new
                         break
-                    elif (mode == 'n' or mode=='N'):
+                    elif (mode == 'n' or mode == 'N'):
                         details = details_new
                         break
                     else:
                         print("(Y/N)??")
                         continue
-                config.set(patient_name,'sickness_details',details)
-                print(config.get(patient_name, 'sickness_details'))       
+                config.set(patient_name, 'sickness_details', details)
+                print(config.get(patient_name, 'sickness_details'))
                 print('Updated Successfully')
             else:
                 print('You do not have permission to edit this section')
-                
-        elif option=='1':
-            if (pl=="admin_4"):
+        elif option == '1':
+            if (pl == "admin_4"):
                 details_old = config.get(patient_name, 'personal_details')
-                print ('Old Record: ', details_old)
+                print('Old Record: ', details_old)
                 print("Enter New Details:")
                 details_new = input('> ').strip()
                 mode = input("Do you want to keep old records (Y/N): ")
                 while True:
-                    if (mode == 'y' or mode=='Y'):
+                    if (mode == 'y' or mode == 'Y'):
                         details = details_old + ', ' + details_new
                         break
-                    elif (mode == 'n' or mode=='N'):
+                    elif (mode == 'n' or mode == 'N'):
                         details = details_new
                         break
                     else:
                         print("(Y/N)??")
                         continue
-                config.set(patient_name,'personal_details',details)
-                print(config.get(patient_name, 'personal_details'))       
+                config.set(patient_name, 'personal_details', details)
+                print(config.get(patient_name, 'personal_details'))
                 print('Updated Successfully')
             else:
                 print('You do not have permission to edit this section')
-                
-        elif option=='3':
-            if (pl=="admin_1" or pl=="admin_2" or pl=="admin_5"):
+        elif option == '3':
+            if (pl == "admin_1" or pl == "admin_2" or pl == "admin_5"):
                 details_old = config.get(patient_name, 'drug_prescription')
-                print ('Old Record: ', details_old)
+                print('Old Record: ', details_old)
                 print("Enter New Details:")
                 details_new = input('> ').strip()
                 mode = input("Do you want to keep old records (Y/N): ")
                 while True:
-                    if (mode == 'y' or mode=='Y'):
+                    if (mode == 'y' or mode == 'Y'):
                         details = details_old + ', ' + details_new
                         break
-                    elif (mode == 'n' or mode=='N'):
+                    elif (mode == 'n' or mode == 'N'):
                         details = details_new
                         break
                     else:
                         print("(Y/N)??")
                         continue
-                config.set(patient_name,'drug_prescription',details)
-                print(config.get(patient_name, 'drug_prescription'))       
+                config.set(patient_name, 'drug_prescription', details)
+                print(config.get(patient_name, 'drug_prescription'))
                 print('Updated Successfully')
             else:
                 print('You do not have permission to edit this section')
-
-        elif option=='4':
-            if (pl=="admin_1" or pl=="admin_2" or pl=="admin_3"):
+        elif option == '4':
+            if (pl == "admin_1" or pl == "admin_2" or pl == "admin_3"):
                 details_old = config.get(patient_name, 'lab_test_prescription')
-                print ('Old Record: ', details_old)
+                print('Old Record: ', details_old)
                 print("Enter New Details:")
                 details_new = input('> ').strip()
                 mode = input("Do you want to keep old records (Y/N): ")
                 while True:
-                    if (mode == 'y' or mode=='Y'):
+                    if (mode == 'y' or mode == 'Y'):
                         details = details_old + ', ' + details_new
                         break
-                    elif (mode == 'n' or mode=='N'):
+                    elif (mode == 'n' or mode == 'N'):
                         details = details_new
                         break
                     else:
                         print("(Y/N)??")
                         continue
-                config.set(patient_name,'lab_test_prescription',details)
-                print(config.get(patient_name, 'lab_test_prescription'))       
+                config.set(patient_name, 'lab_test_prescription', details)
+                print(config.get(patient_name, 'lab_test_prescription'))
                 print('Updated Successfully')
             else:
-                print('You do not have permission to edit this section')       
-                     
-        elif option=='5':
+                print('You do not have permission to edit this section')
+        elif option == '5':
             break
     config.write(open('data.ini', 'w'))
 
-#patient session
+# patient session
 def patientSession(username):
     while True:
         print("Options: \n 1.view history \n 2.logout")
@@ -259,72 +251,58 @@ def patientSession(username):
             print("Logging out...")
             time.sleep(2)
             break
-        elif option=="1":
+        elif option == "1":
             if(verifyPatient(username)):
-                viewSession(username)
+                viewSession(username,'admin_0')
             else:
-                print("No Records") 
-            
+                print("No Records")
         else:
             print("Not an option")
-            
 
-#register
-
+# register
 def register():
- 
     while True:
         username = input("New username: ").strip()
         print("Enter User Type: ")
         print("Options: staff | patient")
         user_type = input("> ")
         if user_type == "patient":
-            privilege_level="admin_0"
+            privilege_level = "admin_0"
             username = username + " " + "patient"
-            
             if not (checkAvailability(username)):
-                continue    
-            break        
-            
+                continue
+            break
         elif user_type == "staff":
             username = username + " " + "staff"
-            
             if not (checkAvailability(username)):
-                continue 
-            
+                continue
             print("select staff type ( doctor | nurse | lab | reception | pharmacy )")
             while True:
-                staff_type = input("> ")      
+                staff_type = input("> ")
                 user_type = staff_type
-                
-                if  staff_type == "doctor":
-                    privilege_level="admin_1"
+                if staff_type == "doctor":
+                    privilege_level = "admin_1"
                     break
-                
-                elif  staff_type == "nurse":
-                    privilege_level="admin_2"
+                elif staff_type == "nurse":
+                    privilege_level = "admin_2"
                     break
-                
-                elif  staff_type == "lab":
-                    privilege_level="admin_3"
+
+                elif staff_type == "lab":
+                    privilege_level = "admin_3"
                     break
-                elif  staff_type == "reception":
-                    privilege_level="admin_4"
+                elif staff_type == "reception":
+                    privilege_level = "admin_4"
                     break
-                elif  staff_type == "pharmacy":
-                    privilege_level="admin_5"
+                elif staff_type == "pharmacy":
+                    privilege_level = "admin_5"
                     break
-                
                 else:
                     print(staff_type + " is not an option")
                     continue
-            
             break
-        
         else:
             print(user_type + " is not an option")
             continue
-        
     while True:
         password = getpass.getpass(prompt="New password: ")
         if not len(password) > 0:
@@ -332,32 +310,24 @@ def register():
             continue
         else:
             confirm_password = getpass.getpass(prompt="Confirm Password: ")
-            if (password==confirm_password):
+            if (password == confirm_password):
                 print("Passwords Matched...")
                 break
             else:
                 print("Not Matching.Please Re-enter...")
                 continue
-            
     print("Creating account...")
     en_password = encrypt(password)
-    
+
     config = configparser.ConfigParser()
     config.read('config.ini')
     config[username] = {"password": en_password,
                         "user_type": user_type,
-                        "privilege_level": privilege_level }
-
-    
-    with open('config.ini','w') as configfile:
+                        "privilege_level": privilege_level}
+    with open('config.ini', 'w') as configfile:
         config.write(configfile)
-
-    
-
-    
     time.sleep(1)
     print("Account has been created")
-
 
 # Login
 def login():
@@ -370,14 +340,14 @@ def login():
             print("Enter User Type: ")
             print("Options: staff | patient")
             user_type = input("> ")
-            if (user_type=='staff') or (user_type=='patient'):
+            if (user_type == 'staff') or (user_type == 'patient'):
                 username = username + " " + user_type
                 if(verifyUsername(username)):
                     print("***user verfied***")
-              
+
                     while True:
                         password = getpass.getpass(prompt="Password: ")
-                        if(verifyPassword(username,password)):
+                        if(verifyPassword(username, password)):
                             session(username)
                             break
                         else:
@@ -386,14 +356,11 @@ def login():
                 else:
                     print("invalid username or user type")
                     continue
-
             else:
                 print(user_type + " is not an option")
                 continue
-                
-    
-#Start
 
+# Start
 print("Welcome to the medical data processing system. Please register or login.")
 while True:
     print("Options: register | login | exit")
@@ -407,7 +374,6 @@ while True:
     else:
         print(option + " is not an option")
 
-#Exit
-
+# Exit
 print("Shutting down...")
 time.sleep(1)
