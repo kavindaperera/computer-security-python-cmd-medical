@@ -77,9 +77,9 @@ def session(username):
 # staff session
 def staffSession(privilege_level):
     while True:
-        print("Options: \n 1.view or edit patient details \n 2.logout")
+        print("Options: \n 1.View or Edit Patient Details \n 2.Create New Patient Record \n 3.logout")
         option = input("> ")
-        if option == "2":
+        if option == "3":
             print("Logging out...")
             time.sleep(2)
             break
@@ -97,6 +97,24 @@ def staffSession(privilege_level):
                     editSession(patient_name, privilege_level)
             else:
                 print("No Records")
+        elif option == "2":
+            config = configparser.ConfigParser()
+            config.read(data_file)
+            if (privilege_level=='admin_4'):
+                patient_name = input("Enter patient name: ")
+                patient_name = patient_name + " " + "patient"
+                if not (verifyPatient(patient_name)):
+                    personal_details = input("Enter personal details: ")
+                    config[patient_name] = {"personal_details": personal_details,
+                                            "sickness_details": "",
+                                            "drug_prescription": "",
+                                            "lab_test_prescription": ""}
+                    with open('data.ini', 'w') as configfile:
+                        config.write(configfile)
+                else:
+                    print('Patient details already exist')
+            else:
+                print('You do not have permission to create new records')
         else:
             print("Not an option!")
             continue
@@ -145,7 +163,7 @@ def editSession(patient_name, pl):
     config = configparser.ConfigParser()
     config.read(data_file)
     while True:
-        print("Select a section to Edit: \n 1.personal details \n 2.sickness details \n 3.drug prescriptions \n 4.lab test prespriptions \n 5.back/done")
+        print("Select a section to Edit: \n 1.personal details \n 2.sickness details \n 3.drug prescriptions \n 4.lab test prespriptions \n 5.back/save")
         option = input('> ')
         if option == '2':
             if (pl == "admin_1" or pl == "admin_2"):
@@ -358,7 +376,7 @@ def login():
                 continue
 
 # Start
-print("Welcome to the medical data processing system. Please register or login.")
+print("Welcome to the Medical Data Processing System. Please Register or Login.")
 while True:
     print("Options: register | login | exit")
     option = input("> ")
