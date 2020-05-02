@@ -210,7 +210,7 @@ def editSession(patient_name, pl):
             else:
                 print('You do not have permission to edit this section')
         elif option == '3':
-            if (pl == "admin_1" or pl == "admin_2" or pl == "admin_5"):
+            if (pl == "admin_1" or pl == "admin_2"):
                 details_old = config.get(patient_name, 'drug_prescription')
                 print('Old Record: ', details_old)
                 print("Enter New Details:")
@@ -274,6 +274,15 @@ def patientSession(username):
         else:
             print("Not an option")
 
+#staff verification
+def staffVerification(v_code):
+    config = configparser.ConfigParser()
+    config.read(config_file)
+    sections = config.sections()
+    return (config.get("staff verification", v_code,fallback='1234567'))
+
+
+
 # register
 def register():
     while True:
@@ -291,28 +300,34 @@ def register():
             username = username + " " + "staff"
             if not (checkAvailability(username)):
                 continue
-            print("select staff type ( doctor | nurse | lab | reception | pharmacy )")
             while True:
-                staff_type = input("> ")
+                print("Enter provided verfication code:")
+                v_code = input("> ").strip()
+                staff_type = staffVerification(v_code)
+                ##print(staffVerification(v_code))
                 user_type = staff_type
                 if staff_type == "doctor":
+                    print("Account type:", staff_type)
                     privilege_level = "admin_1"
                     break
                 elif staff_type == "nurse":
+                    print("Account type:", staff_type)
                     privilege_level = "admin_2"
                     break
-
                 elif staff_type == "lab":
+                    print("Account type:", staff_type)
                     privilege_level = "admin_3"
                     break
-                elif staff_type == "reception":
+                elif staff_type == "receptionist":
+                    print("Account type:", staff_type)
                     privilege_level = "admin_4"
                     break
                 elif staff_type == "pharmacy":
+                    print("Account type:", staff_type)
                     privilege_level = "admin_5"
                     break
                 else:
-                    print(staff_type + " is not an option")
+                    print("please check the verification code..")
                     continue
             break
         else:
