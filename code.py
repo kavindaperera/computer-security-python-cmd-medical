@@ -281,8 +281,6 @@ def staffVerification(v_code):
     sections = config.sections()
     return (config.get("staff verification", v_code,fallback='1234567'))
 
-
-
 # register
 def register():
     while True:
